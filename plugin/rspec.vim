@@ -1,3 +1,6 @@
+" Note: I took the same approach as vim-rails to enhance the ruby filetype
+" settings with rspec specific stuff.
+
 if exists('g:loaded_rspec_tools')
   finish
 endif

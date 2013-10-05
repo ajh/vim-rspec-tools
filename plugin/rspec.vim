@@ -34,34 +34,92 @@ function! <SID>:synname()
 endfunction
 " }}}
 
-" This kinda works! But it shouldn't add focus if its already there.
-"function! Rspec:focus()
-  "call <SID>:searchsyn('\<context\|describe\|it\|its\>', 'rubyRailsTestMethod', 'b', 'n')
-  "execute "normal! $gEa, :focus => true\<ESC>"
-"endfunction
-
 " focus metadata functions -------------------- {{{
 " Adds a focus metadata flag to the rspec group or example.
 "
 " * Doesn't add focus if its already set
 " * errors if the line doesn't look like it starts a group or example
 "   definition
-function! Rspec:AddFocus()
+function! RspecFocusAdd()
+  if !RspecIsLineFocusable()
+		echohl WarningMsg
+    echom "Line can't have rspec metadata"
+    echohl None
+    return
+  endif
+
+  if RspecHasFocus()
+    return
+  endif
+
+  execute "normal! $gEa, :focus => true\<ESC>"
 endfunction
 
 " Deletes a focus metadata flag to the rspec group or example.
 "
 " * Doesn't do anything if focus doesn't seem to be set
 " * maybe errors if the line doesn't look right?
-function! Rspec:DelFocus()
+function! RspecFocusDel()
+  if !RspecIsLineFocusable()
+		echohl WarningMsg
+    echom "Line can't have rspec metadata"
+    echohl None
+    return
+  endif
+
+  if !RspecHasFocus()
+    return
+  endif
+
+  silent execute "normal! " . ':s/\v,\s+:focus(\s+\=\>\s+true)?//' . "\<CR>"
 endfunction
 
 " Toggles the focus metadata flag to the rspec group or example.
 "
 " * maybe errors if the line doesn't look right?
-function! Rspec:ToggleFocus()
+function! RspecFocusToggle()
+  if !RspecIsLineFocusable()
+		echohl WarningMsg
+    echom "Line can't have rspec metadata"
+    echohl None
+    return
+  endif
+
+  if RspecHasFocus()
+    call RspecFocusDel()
+  else
+    call RspecFocusAdd()
+  endif
 endfunction
 
+" Deletes all focus metadata from the file, if any
+function! RspecFocusClear()
+  silent execute "normal! " . ':%s/\v((context|describe|its?).+),\s+:focus(\s+\=\>\s+true)?(.*$)/\1\4/' . "\<CR>"
+endfunction
+
+" Returns truth whether the line under the cursor can have focus
+function! RspecIsLineFocusable()
+  let l:old_unnamed = @"
+  try
+    normal! ^y$
+    return @" =~# '\v(context|describe|its?).*do\s*$'
+
+  finally
+    let @" = l:old_unnamed
+  endtry
+endfunction
+
+" Returns truth whether the line under the cursor can have focus
+function! RspecHasFocus()
+  let l:old_unnamed = @"
+  try
+    normal! ^y$
+    return @" =~# '\v(context|describe|its?).*:focus.*do\s*$'
+
+  finally
+    let @" = l:old_unnamed
+  endtry
+endfunction
 " }}}
 
 function! <SID>:BufInit()

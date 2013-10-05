@@ -1,0 +1,42 @@
+*rspec-tools.txt* Tools for ruby's rspec DSL
+
+
+           ____                        _____           _           ~
+          |  _ \ ___ _ __   ___  ___  |_   _|__   ___ | |___       ~
+          | |_) / __| '_ \ / _ \/ __|   | |/ _ \ / _ \| / __|      ~
+          |  _ <\__ \ |_) |  __/ (__    | | (_) | (_) | \__ \      ~
+          |_| \_\___/ .__/ \___|\___|   |_|\___/ \___/|_|___/      ~
+                    |_|                                            ~
+
+====================================================================
+CONTENTS                                          *RspecToolsContents*
+
+    1. Usage ................ |RspecToolsUsage|
+    2. Mappings ............. |RspecToolsMappings|
+    3. License .............. |RspecToolsLicense|
+    4. TODO ................. |RspecToolsBugs|
+
+====================================================================
+Section 1: Usage                                     *RspecToolsUsage*
+
+TBD
+
+====================================================================
+Section 2: Mappings                                  *RspecToolsUsage*
+
+TBD
+
+====================================================================
+Section 3: License                                   *RspecToolsUsage*
+
+TBD
+
+====================================================================
+Section 4: TODO                                      *RspecToolsUsage*
+
+  * I have functions, but I'll either want commands or mappings to call them
+
+  * The word motions aren't quite right. I think I want [m and ]m to be for 'def'
+    and 'it', while the other thing does 'class', and 'describe'.
+
+  * standardize on RspecTools namespace. Don't use plain 'Rspec' and change the plugin filename too.

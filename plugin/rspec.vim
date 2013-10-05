@@ -120,6 +120,7 @@ function! s:RspecHasFocus()
 endfunction
 " }}}
 
+" plugin initialization -------------------- {{{
 function! <SID>:BufInit()
   " method motions stop on group and example defns like 'describe' and 'it'
   nnoremap <silent> <buffer> [m :<C-U>call <SID>:searchsyn('\<\%(context\<Bar>def\<Bar>describe\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','n')<CR>
@@ -131,3 +132,4 @@ endfunction
 augroup rspecPluginDetect
   autocmd BufNewFile,BufRead *_spec.rb call <SID>:BufInit()
 augroup END
+" }}}

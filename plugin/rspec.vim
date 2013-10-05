@@ -42,13 +42,10 @@ endfunction
 "   definition
 function! RspecFocusAdd()
   if !RspecIsLineFocusable()
-		echohl WarningMsg
-    echom "Line can't have rspec metadata"
-    echohl None
     return
   endif
 
-  if RspecHasFocus()
+  if s:RspecHasFocus()
     return
   endif
 
@@ -61,13 +58,10 @@ endfunction
 " * maybe errors if the line doesn't look right?
 function! RspecFocusDel()
   if !RspecIsLineFocusable()
-		echohl WarningMsg
-    echom "Line can't have rspec metadata"
-    echohl None
     return
   endif
 
-  if !RspecHasFocus()
+  if !s:RspecHasFocus()
     return
   endif
 
@@ -79,13 +73,10 @@ endfunction
 " * maybe errors if the line doesn't look right?
 function! RspecFocusToggle()
   if !RspecIsLineFocusable()
-		echohl WarningMsg
-    echom "Line can't have rspec metadata"
-    echohl None
     return
   endif
 
-  if RspecHasFocus()
+  if s:RspecHasFocus()
     call RspecFocusDel()
   else
     call RspecFocusAdd()
@@ -97,12 +88,19 @@ function! RspecFocusClear()
   silent execute "normal! " . ':%s/\v((context|describe|its?).+),\s+:focus(\s+\=\>\s+true)?(.*$)/\1\4/' . "\<CR>"
 endfunction
 
-" Returns truth whether the line under the cursor can have focus
+" Returns truth whether the line under the cursor can have focus. Also warns.
 function! RspecIsLineFocusable()
   let l:old_unnamed = @"
   try
     normal! ^y$
-    return @" =~# '\v(context|describe|its?).*do\s*$'
+    if @" =~# '\v(context|describe|its?).*do\s*$'
+      return 1
+    else
+      echohl WarningMsg
+      echom "Line can't have rspec metadata"
+      echohl None
+      return 0
+    endif
 
   finally
     let @" = l:old_unnamed
@@ -110,7 +108,7 @@ function! RspecIsLineFocusable()
 endfunction
 
 " Returns truth whether the line under the cursor can have focus
-function! RspecHasFocus()
+function! s:RspecHasFocus()
   let l:old_unnamed = @"
   try
     normal! ^y$

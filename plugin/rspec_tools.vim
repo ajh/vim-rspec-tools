@@ -40,12 +40,12 @@ endfunction
 " * Doesn't add focus if its already set
 " * errors if the line doesn't look like it starts a group or example
 "   definition
-function! RspecFocusAdd()
-  if !RspecIsLineFocusable()
+function! RspecToolsFocusAdd()
+  if !RspecToolsIsLineFocusable()
     return
   endif
 
-  if s:RspecHasFocus()
+  if s:RspecToolsHasFocus()
     return
   endif
 
@@ -56,12 +56,12 @@ endfunction
 "
 " * Doesn't do anything if focus doesn't seem to be set
 " * maybe errors if the line doesn't look right?
-function! RspecFocusDel()
-  if !RspecIsLineFocusable()
+function! RspecToolsFocusDel()
+  if !RspecToolsIsLineFocusable()
     return
   endif
 
-  if !s:RspecHasFocus()
+  if !s:RspecToolsHasFocus()
     return
   endif
 
@@ -71,25 +71,25 @@ endfunction
 " Toggles the focus metadata flag to the rspec group or example.
 "
 " * maybe errors if the line doesn't look right?
-function! RspecFocusToggle()
-  if !RspecIsLineFocusable()
+function! RspecToolsFocusToggle()
+  if !RspecToolsIsLineFocusable()
     return
   endif
 
-  if s:RspecHasFocus()
-    call RspecFocusDel()
+  if s:RspecToolsHasFocus()
+    call RspecToolsFocusDel()
   else
-    call RspecFocusAdd()
+    call RspecToolsFocusAdd()
   endif
 endfunction
 
 " Deletes all focus metadata from the file, if any
-function! RspecFocusClear()
+function! RspecToolsFocusClear()
   silent execute "normal! " . ':%s/\v((context|describe|its?).+),\s+:focus(\s+\=\>\s+true)?(.*$)/\1\4/' . "\<CR>"
 endfunction
 
 " Returns truth whether the line under the cursor can have focus. Also warns.
-function! RspecIsLineFocusable()
+function! RspecToolsIsLineFocusable()
   let l:old_unnamed = @"
   try
     normal! ^y$
@@ -108,7 +108,7 @@ function! RspecIsLineFocusable()
 endfunction
 
 " Returns truth whether the line under the cursor can have focus
-function! s:RspecHasFocus()
+function! s:RspecToolsHasFocus()
   let l:old_unnamed = @"
   try
     normal! ^y$
@@ -133,11 +133,11 @@ function! <SID>BufInit()
   xnoremap <silent> <buffer> [[ :<C-U>call <SID>searchsyn('\<\%(class\<Bar>module\<Bar>describe\<Bar>context\)\>','rubyModule\<Bar>rubyClass\<Bar>rubyRailsTestMethod','b','v')<CR>
   xnoremap <silent> <buffer> ]] :<C-U>call <SID>searchsyn('\<\%(class\<Bar>module\<Bar>describe\<Bar>context\)\>','rubyModule\<Bar>rubyClass\<Bar>rubyRailsTestMethod','','v')<CR>
 
-  nnoremap <silent> <buffer> <leader>rf :call RspecFocusToggle()<CR>
-  nnoremap <silent> <buffer> <leader>rc :call RspecFocusClear()<CR>
+  nnoremap <silent> <buffer> <leader>rf :call RspecToolsFocusToggle()<CR>
+  nnoremap <silent> <buffer> <leader>rc :call RspecToolsFocusClear()<CR>
 endfunction
 
-augroup rspecPluginDetect
+augroup RspecToolsPluginDetect
   autocmd BufNewFile,BufRead *_spec.rb call <SID>BufInit()
 augroup END
 " }}}

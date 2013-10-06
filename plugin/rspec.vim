@@ -7,7 +7,7 @@ endif
 let g:loaded_rspec_tools = 1
 
 " Ripped from vim-ruby. I wish these weren't script scoped  -------------------- {{{
-function! <SID>:searchsyn(pattern,syn,flags,mode)
+function! <SID>searchsyn(pattern,syn,flags,mode)
   norm! m'
   if a:mode ==# 'v'
     norm! gv
@@ -19,7 +19,7 @@ function! <SID>:searchsyn(pattern,syn,flags,mode)
     let line = line('.')
     let col  = col('.')
     let pos = search(a:pattern,'W'.a:flags)
-    while pos != 0 && <SID>:synname() !~# a:syn
+    while pos != 0 && <SID>synname() !~# a:syn
       let pos = search(a:pattern,'W'.a:flags)
     endwhile
     if pos == 0
@@ -29,7 +29,7 @@ function! <SID>:searchsyn(pattern,syn,flags,mode)
   endwhile
 endfunction
 
-function! <SID>:synname()
+function! <SID>synname()
   return synIDattr(synID(line('.'),col('.'),0),'name')
 endfunction
 " }}}
@@ -121,15 +121,23 @@ endfunction
 " }}}
 
 " plugin initialization -------------------- {{{
-function! <SID>:BufInit()
+function! <SID>BufInit()
   " method motions stop on group and example defns like 'describe' and 'it'
-  nnoremap <silent> <buffer> [m :<C-U>call <SID>:searchsyn('\<\%(context\<Bar>def\<Bar>describe\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','n')<CR>
-  nnoremap <silent> <buffer> ]m :<C-U>call <SID>:searchsyn('\<\%(context\<Bar>def\<Bar>describe\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','','n')<CR>
-  xnoremap <silent> <buffer> [m :<C-U>call <SID>:searchsyn('\<\%(context\<Bar>def\<Bar>describe\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','v')<CR>
-  xnoremap <silent> <buffer> ]m :<C-U>call <SID>:searchsyn('\<\%(context\<Bar>def\<Bar>describe\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','v')<CR>
+  nnoremap <silent> <buffer> [m :<C-U>call <SID>searchsyn('\<\%(def\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','n')<CR>
+  nnoremap <silent> <buffer> ]m :<C-U>call <SID>searchsyn('\<\%(def\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','','n')<CR>
+  xnoremap <silent> <buffer> [m :<C-U>call <SID>searchsyn('\<\%(def\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','v')<CR>
+  xnoremap <silent> <buffer> ]m :<C-U>call <SID>searchsyn('\<\%(def\<Bar>it\<Bar>its\)\>', 'rubyDefine\<Bar>rubyRailsTestMethod','b','v')<CR>
+
+  nnoremap <silent> <buffer> [[ :<C-U>call <SID>searchsyn('\<\%(class\<Bar>module\<Bar>describe\<Bar>context\)\>','rubyModule\<Bar>rubyClass\<Bar>rubyRailsTestMethod','b','n')<CR>
+  nnoremap <silent> <buffer> ]] :<C-U>call <SID>searchsyn('\<\%(class\<Bar>module\<Bar>describe\<Bar>context\)\>','rubyModule\<Bar>rubyClass\<Bar>rubyRailsTestMethod','','n')<CR>
+  xnoremap <silent> <buffer> [[ :<C-U>call <SID>searchsyn('\<\%(class\<Bar>module\<Bar>describe\<Bar>context\)\>','rubyModule\<Bar>rubyClass\<Bar>rubyRailsTestMethod','b','v')<CR>
+  xnoremap <silent> <buffer> ]] :<C-U>call <SID>searchsyn('\<\%(class\<Bar>module\<Bar>describe\<Bar>context\)\>','rubyModule\<Bar>rubyClass\<Bar>rubyRailsTestMethod','','v')<CR>
+
+  nnoremap <silent> <buffer> <leader>rf :call RspecFocusToggle()<CR>
+  nnoremap <silent> <buffer> <leader>rc :call RspecFocusClear()<CR>
 endfunction
 
 augroup rspecPluginDetect
-  autocmd BufNewFile,BufRead *_spec.rb call <SID>:BufInit()
+  autocmd BufNewFile,BufRead *_spec.rb call <SID>BufInit()
 augroup END
 " }}}

@@ -41,7 +41,7 @@ endfunction
 " * errors if the line doesn't look like it starts a group or example
 "   definition
 function! RspecToolsFocusAdd()
-  if !RspecToolsIsLineFocusable()
+  if !s:RspecToolsIsLineFocusable()
     return
   endif
 
@@ -49,15 +49,15 @@ function! RspecToolsFocusAdd()
     return
   endif
 
-  execute "normal! $gEa, :focus => true\<ESC>"
+  call s:Preserve("normal! $gEa, :focus => true\<ESC>")
 endfunction
 
 " Deletes a focus metadata flag to the rspec group or example.
 "
 " * Doesn't do anything if focus doesn't seem to be set
-" * maybe errors if the line doesn't look right?
+" * errors if the line doesn't look right?
 function! RspecToolsFocusDel()
-  if !RspecToolsIsLineFocusable()
+  if !s:RspecToolsIsLineFocusable()
     return
   endif
 
@@ -65,14 +65,14 @@ function! RspecToolsFocusDel()
     return
   endif
 
-  silent execute "normal! " . ':s/\v,\s+:focus(\s+\=\>\s+true)?//' . "\<CR>"
+  call s:Preserve("normal! " . ':s/\v,\s+:focus(\s+\=\>\s+true)?//' . "\<CR>", 'silent')
 endfunction
 
 " Toggles the focus metadata flag to the rspec group or example.
 "
-" * maybe errors if the line doesn't look right?
+" * errors if the line doesn't look right?
 function! RspecToolsFocusToggle()
-  if !RspecToolsIsLineFocusable()
+  if !s:RspecToolsIsLineFocusable()
     return
   endif
 
@@ -85,11 +85,23 @@ endfunction
 
 " Deletes all focus metadata from the file, if any
 function! RspecToolsFocusClear()
-  silent execute "normal! " . ':%s/\v((context|describe|its?).+),\s+:focus(\s+\=\>\s+true)?(.*$)/\1\4/' . "\<CR>"
+
+  " determine the number of matches in the file, by using the 'n' flag.
+  redir => l:message
+  call s:Preserve("normal! " . ':%s/\v((context|describe|its?).+),\s+:focus(\s+\=\>\s+true)?(.*$)/\1\4/en' . "\<CR>", 'silent')
+  redir END
+  let l:message = tlib#string#TrimLeft(l:message)
+
+  if strlen(l:message) >=# 1
+    call s:Preserve("normal! " . ':%s/\v((context|describe|its?).+),\s+:focus(\s+\=\>\s+true)?(.*$)/\1\4/' . "\<CR>", 'silent')
+    echom l:message
+  else
+    echom "no matches"
+  endif
 endfunction
 
 " Returns truth whether the line under the cursor can have focus. Also warns.
-function! RspecToolsIsLineFocusable()
+function! s:RspecToolsIsLineFocusable()
   let l:old_unnamed = @"
   try
     normal! ^y$
@@ -120,6 +132,29 @@ function! s:RspecToolsHasFocus()
 endfunction
 " }}}
 
+" Run a command without changing the cursor location or last search register
+"
+" Can pass the string 'silent' which will run the command in silent mode.
+function! s:Preserve(command, ...)
+  " Preparation - save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+
+  try
+    if index(a:000, 'silent') ==# -1
+      execute a:command
+    else
+      silent execute a:command
+    endif
+
+  finally
+    let @/=_s
+    call cursor(l, c)
+  endtry
+endfunction
+
+" }}}
 " plugin initialization -------------------- {{{
 function! <SID>BufInit()
   " method motions stop on group and example defns like 'describe' and 'it'

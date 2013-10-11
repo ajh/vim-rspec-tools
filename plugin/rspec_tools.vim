@@ -130,7 +130,6 @@ function! s:RspecToolsHasFocus()
     let @" = l:old_unnamed
   endtry
 endfunction
-" }}}
 
 " Run a command without changing the cursor location or last search register
 "
@@ -153,8 +152,8 @@ function! s:Preserve(command, ...)
     call cursor(l, c)
   endtry
 endfunction
-
 " }}}
+
 " plugin initialization -------------------- {{{
 function! <SID>BufInit()
   " method motions stop on group and example defns like 'describe' and 'it'
